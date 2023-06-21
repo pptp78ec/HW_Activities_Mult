@@ -1,16 +1,18 @@
 package com.example.hw_activities_mult
 
 import android.content.Context
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Spinner
+import androidx.annotation.RequiresApi
 import java.util.Locale
 
 class SearchFilter : AppCompatActivity() {
 
-    val objectsGot: MutableList<ModelAuto>? = null
+    var objectsGot: MutableList<ModelAuto>? = null
 
     private var model: AutoCompleteTextView? = null
     private var brand: AutoCompleteTextView? = null
@@ -18,9 +20,11 @@ class SearchFilter : AppCompatActivity() {
     private var price_to: Spinner? = null
     private var year_from: Spinner? = null
     private var year_to: Spinner? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_filter)
+        objectsGot = (intent.extras?.get("objects") as Array<ModelAuto>).toMutableList()
         model = findViewById(R.id.filter_model)
         brand = findViewById(R.id.filter_brand)
         price_from = findViewById(R.id.price_from)

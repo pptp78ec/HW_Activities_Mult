@@ -1,6 +1,10 @@
 package com.example.hw_activities_mult
 
+import android.os.Parcel
+import android.os.Parcelable
+import android.view.Display.Mode
 import androidx.appcompat.app.AppCompatActivity
+import java.io.Serializable
 import java.time.LocalDate
 
 data class ModelAuto
@@ -11,8 +15,41 @@ data class ModelAuto
     var description: String,
     var cost: Int,
     val image: Int
-) {
-    companion object Factory {
+) : Parcelable {
+
+
+    constructor(parcel: Parcel) : this(
+        parcel.readString().orEmpty(),
+        parcel.readString().orEmpty(),
+        LocalDate.of(parcel.readInt(), 1, 1),
+        parcel.readString().orEmpty(),
+        parcel.readInt(),
+        parcel.readInt()
+    ) {
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeString(brand)
+        dest.writeString(model)
+        dest.writeInt(year.year)
+        dest.writeString(description)
+        dest.writeInt(cost)
+        dest.writeInt(image)
+    }
+
+    companion object CREATOR : Parcelable.Creator<ModelAuto> {
+        override fun createFromParcel(parcel: Parcel): ModelAuto {
+            return ModelAuto(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ModelAuto?> {
+            return newArray(size)
+        }
+
         fun build(): ModelAuto {
             val models = arrayOf(
                 "Supra",
@@ -63,15 +100,16 @@ data class ModelAuto
             return ModelAuto(
                 brands.random(),
                 models.random(),
-                LocalDate.of((1990..2023).random(), (1..12).random(), (1..30).random()),
+                LocalDate.of((1990..2023).random(), 1, 1),
                 description.random(),
                 (2000..30000).random(),
                 images.random()
             )
         }
-        fun generate100(): MutableList<ModelAuto>{
+
+        fun generate100(): MutableList<ModelAuto> {
             val list = mutableListOf<ModelAuto>()
-            for(x in 1..100){
+            for (x in 1..100) {
                 list.add(build())
             }
             return list
