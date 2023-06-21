@@ -4,15 +4,23 @@ import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.widget.addTextChangedListener
 import java.util.Locale
 
 class SearchFilter : AppCompatActivity() {
 
     var objectsGot: MutableList<ModelAuto>? = null
+    var objectsFiltered: MutableList<ModelAuto>?=null
+    val instance = this
 
     private var model: AutoCompleteTextView? = null
     private var brand: AutoCompleteTextView? = null
@@ -36,7 +44,9 @@ class SearchFilter : AppCompatActivity() {
         year_to = findViewById(R.id.year_to)
         year_to?.adapter = YearsAdapter.build(this, R.id.year_to)
 
+
     }
+
 
     fun filter(objects: MutableList<ModelAuto>): MutableList<ModelAuto> {
         var objectsHere = objects
@@ -75,6 +85,50 @@ class SearchFilter : AppCompatActivity() {
         }
 
         return objectsHere
+    }
+
+    private fun filterToast(objects: MutableList<ModelAuto>?){
+        if(!objectsGot.isNullOrEmpty()) {
+            objectsFiltered = filter(objectsGot!!)
+            Toast.makeText(instance, "Found results" + objectsFiltered?.size.toString(), Toast.LENGTH_LONG).show()
+        }
+    }
+    private fun itemSelectedListener() = object : AdapterView.OnItemSelectedListener {
+        override fun onItemSelected(
+            parent: AdapterView<*>?,
+            view: View?,
+            position: Int,
+            id: Long
+        ) {
+            filterToast(objectsGot)
+        }
+
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+        }
+    }
+    private fun textChangedListener() = object: TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            filterToast(objectsGot)
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+
+        }
+
+    }
+    private fun addListeners(){
+        model?.addTextChangedListener(textChangedListener())
+        brand?.addTextChangedListener(textChangedListener())
+        price_to?.onItemSelectedListener = itemSelectedListener()
+        price_from?.onItemSelectedListener = itemSelectedListener()
+        year_from?.onItemSelectedListener = itemSelectedListener()
+        year_to?.onItemSelectedListener = itemSelectedListener()
+
     }
 
     class YearsAdapter(val context: Context, val resource: Int, years: MutableList<Int>) :
