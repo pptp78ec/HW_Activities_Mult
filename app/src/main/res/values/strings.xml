@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">HW_Activities_Mult</string>
+    <string name="brand">Brand</string>
+    <string name="model">Model</string>
+    <string name="year_from">Year from</string>
+    <string name="to">to</string>
+    <string name="price_from">Price from</string>
+    <string name="filter">Filter...</string>
+    <string name="clear_filter">Clear filter</string>
 </resources>
