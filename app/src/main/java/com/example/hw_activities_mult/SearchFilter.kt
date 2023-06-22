@@ -1,6 +1,7 @@
 package com.example.hw_activities_mult
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.Button
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -28,10 +30,12 @@ class SearchFilter : AppCompatActivity() {
     private var price_to: Spinner? = null
     private var year_from: Spinner? = null
     private var year_to: Spinner? = null
+    private var button_res: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_filter)
+        button_res = findViewById(R.id.button_showresults)
         objectsGot = (intent.extras?.get("objects") as Array<ModelAuto>).toMutableList()
         model = findViewById(R.id.filter_model)
         brand = findViewById(R.id.filter_brand)
@@ -91,8 +95,18 @@ class SearchFilter : AppCompatActivity() {
         if(!objectsGot.isNullOrEmpty()) {
             objectsFiltered = filter(objectsGot!!)
             Toast.makeText(instance, "Found results" + objectsFiltered?.size.toString(), Toast.LENGTH_LONG).show()
+            button_res?.visibility = View.VISIBLE
         }
+        else
+            button_res?.visibility = View.INVISIBLE
     }
+    private fun resClickListener() = View.OnClickListener {
+        val data: Intent = Intent()
+        data.putExtra("retObject", objectsFiltered?.toTypedArray())
+        setResult(RESULT_OK,data)
+        finish()
+    }
+
     private fun itemSelectedListener() = object : AdapterView.OnItemSelectedListener {
         override fun onItemSelected(
             parent: AdapterView<*>?,
@@ -128,7 +142,7 @@ class SearchFilter : AppCompatActivity() {
         price_from?.onItemSelectedListener = itemSelectedListener()
         year_from?.onItemSelectedListener = itemSelectedListener()
         year_to?.onItemSelectedListener = itemSelectedListener()
-
+        button_res?.setOnClickListener(resClickListener())
     }
 
     class YearsAdapter(val context: Context, val resource: Int, years: MutableList<Int>) :
