@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
     private var carObjects = mutableListOf<ModelAuto>()
+    private var carlist: ListView? = null
+    private var tempObjects= mutableListOf<ModelAuto>()
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     val result =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -20,19 +23,23 @@ class MainActivity : AppCompatActivity() {
                 val bundle = it.data?.extras?.getBundle("BUNDLE")
                 val objtsRet = bundle?.getSerializable("retObjects", Array<ModelAuto>::class.java)
                 if (objtsRet != null) {
-                    carObjects = objtsRet.toMutableList()
+                    carObjects.clear()
+                    carObjects.addAll(objtsRet)
+                    (carlist?.adapter as ModelListAdapter).notifyDataSetChanged()
                 }
-                recreate()
+
             }
         }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        carlist = findViewById<ListView>(R.id.carlist)
         setSupportActionBar(findViewById(R.id.toolbar))
         if (carObjects.isEmpty())
             carObjects = ModelAuto.generate100()
-        findViewById<ListView>(R.id.carlist).adapter =
-            ModelListAdapter(this, R.layout.listitem,  carObjects)
+        carlist?.adapter =
+            ModelListAdapter(this, R.layout.listitem, carObjects)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -42,17 +49,27 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menuitem_filter) {
-            val intent = Intent(this, SearchFilter::class.java)
-            val bundle = Bundle()
-            bundle.putSerializable("objects", carObjects.toTypedArray())
-            intent.putExtra("BUNDLE", bundle )
+        return when (item.itemId) {
+            R.id.menuitem_filter -> {
+                tempObjects.addAll(carObjects)
+                val intent = Intent(this, SearchFilter::class.java)
+                val bundle = Bundle()
+                bundle.putSerializable("objects", carObjects.toTypedArray())
+                intent.putExtra("BUNDLE", bundle)
 
 
-            result.launch(intent)
-            return true
+                result.launch(intent)
+
+                true
+            }
+            R.id.menuitem_filter_clear -> {
+                carObjects.clear()
+                carObjects.addAll(tempObjects)
+                (carlist?.adapter as ModelListAdapter).notifyDataSetChanged()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
 }

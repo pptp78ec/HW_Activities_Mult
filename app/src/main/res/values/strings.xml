@@ -6,4 +6,5 @@
     <string name="to">to</string>
     <string name="price_from">Price from</string>
     <string name="filter">Filter...</string>
+    <string name="clear_filter">Clear filter</string>
 </resources>
