@@ -1,9 +1,5 @@
 package com.example.hw_activities_mult
 
-import android.os.Parcel
-import android.os.Parcelable
-import android.view.Display.Mode
-import androidx.appcompat.app.AppCompatActivity
 import java.io.Serializable
 import java.time.LocalDate
 
@@ -15,40 +11,17 @@ data class ModelAuto
     var description: String,
     var cost: Int,
     val image: Int
-) : Parcelable {
+) :  Serializable {
 
 
-    constructor(parcel: Parcel) : this(
-        parcel.readString().orEmpty(),
-        parcel.readString().orEmpty(),
-        LocalDate.of(parcel.readInt(), 1, 1),
-        parcel.readString().orEmpty(),
-        parcel.readInt(),
-        parcel.readInt()
-    ) {
-    }
 
-    override fun describeContents(): Int {
-        return 0
-    }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeString(brand)
-        dest.writeString(model)
-        dest.writeInt(year.year)
-        dest.writeString(description)
-        dest.writeInt(cost)
-        dest.writeInt(image)
-    }
 
-    companion object CREATOR : Parcelable.Creator<ModelAuto> {
-        override fun createFromParcel(parcel: Parcel): ModelAuto {
-            return ModelAuto(parcel)
-        }
 
-        override fun newArray(size: Int): Array<ModelAuto?> {
-            return newArray(size)
-        }
+
+
+    companion object CREATOR {
+
 
         fun build(): ModelAuto {
             val models = arrayOf(

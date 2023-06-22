@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
-import java.util.Objects
 
 class ModelListAdapter(
     context: Context,
@@ -18,11 +16,11 @@ class ModelListAdapter(
     private var inflater = LayoutInflater.from(context)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-         super.getView(position, convertView, parent)
+
         var localConvertView = convertView
         val viewHolder: ViewHolder
         if(localConvertView == null){
-            localConvertView = inflater.inflate(this.resourse, parent, false)
+            localConvertView = inflater.inflate(resourse, parent, false)
             viewHolder = ViewHolder(localConvertView)
             localConvertView.tag = viewHolder
         }
@@ -36,6 +34,7 @@ class ModelListAdapter(
         viewHolder.yearView?.text = model.year.year.toString()
         viewHolder.descrView?.text = model.description
         viewHolder.modelView?.text = model.model
+
 
         return localConvertView!!
 

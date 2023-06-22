@@ -3,7 +3,6 @@ package com.example.hw_activities_mult
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,7 +14,7 @@ import android.widget.Button
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.widget.addTextChangedListener
+import androidx.appcompat.app.AppCompatActivity
 import java.util.Locale
 
 class SearchFilter : AppCompatActivity() {
@@ -32,11 +31,15 @@ class SearchFilter : AppCompatActivity() {
     private var year_to: Spinner? = null
     private var button_res: Button? = null
 
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_filter)
         button_res = findViewById(R.id.button_showresults)
-        objectsGot = (intent.extras?.get("objects") as Array<ModelAuto>).toMutableList()
+        val bundle = intent.extras?.getBundle("BUNDLE")
+        val objts = bundle?.getSerializable("objects", Array<ModelAuto>::class.java)
+        objectsGot = objts?.toMutableList()
         model = findViewById(R.id.filter_model)
         brand = findViewById(R.id.filter_brand)
         price_from = findViewById(R.id.price_from)
@@ -47,7 +50,7 @@ class SearchFilter : AppCompatActivity() {
         year_from?.adapter = YearsAdapter.build(this, R.id.year_from)
         year_to = findViewById(R.id.year_to)
         year_to?.adapter = YearsAdapter.build(this, R.id.year_to)
-
+        addListeners()
 
     }
 
@@ -91,7 +94,7 @@ class SearchFilter : AppCompatActivity() {
         return objectsHere
     }
 
-    private fun filterToast(objects: MutableList<ModelAuto>?){
+    private fun filterToast() {
         if(!objectsGot.isNullOrEmpty()) {
             objectsFiltered = filter(objectsGot!!)
             Toast.makeText(instance, "Found results" + objectsFiltered?.size.toString(), Toast.LENGTH_LONG).show()
@@ -101,8 +104,10 @@ class SearchFilter : AppCompatActivity() {
             button_res?.visibility = View.INVISIBLE
     }
     private fun resClickListener() = View.OnClickListener {
-        val data: Intent = Intent()
-        data.putExtra("retObject", objectsFiltered?.toTypedArray())
+        val data = Intent()
+        val bundle = Bundle()
+        bundle.putSerializable("retObjects", objectsFiltered?.toTypedArray())
+        data.putExtra("BUNDLE", bundle)
         setResult(RESULT_OK,data)
         finish()
     }
@@ -114,7 +119,7 @@ class SearchFilter : AppCompatActivity() {
             position: Int,
             id: Long
         ) {
-            filterToast(objectsGot)
+            filterToast()
         }
 
         override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -127,7 +132,7 @@ class SearchFilter : AppCompatActivity() {
         }
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            filterToast(objectsGot)
+            filterToast()
         }
 
         override fun afterTextChanged(s: Editable?) {
@@ -145,8 +150,17 @@ class SearchFilter : AppCompatActivity() {
         button_res?.setOnClickListener(resClickListener())
     }
 
-    class YearsAdapter(val context: Context, val resource: Int, years: MutableList<Int>) :
-        ArrayAdapter<Int>(context, resource, years) {
+
+    class PriceAdapter(context: Context, resource: Int, objects: MutableList<Int>) :
+        ArrayAdapter<Int>(context, resource, objects) {
+        companion object Factory {
+            fun build(context: Context, resource: Int): YearsAdapter {
+                return YearsAdapter(context, resource, (2000..30000 step 1000).toMutableList())
+            }
+        }
+    }
+    class YearsAdapter(context: Context, resource: Int, objects: MutableList<Int>) :
+        ArrayAdapter<Int>(context, resource, objects) {
         companion object Factory {
             fun build(context: Context, resource: Int): YearsAdapter {
                 return YearsAdapter(context, resource, (1990..2023).toMutableList())
@@ -154,12 +168,5 @@ class SearchFilter : AppCompatActivity() {
         }
     }
 
-    class PriceAdapter(val context: Context, val resource: Int, years: MutableList<Int>) :
-        ArrayAdapter<Int>(context, resource, years) {
-        companion object Factory {
-            fun build(context: Context, resource: Int): PriceAdapter {
-                return PriceAdapter(context, resource, (2000..30000).toMutableList())
-            }
-        }
-    }
+
 }
